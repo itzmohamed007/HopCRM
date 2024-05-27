@@ -1,2 +1,0 @@
-# HopCRM
-Test Technique HopCRM
