@@ -15,7 +15,7 @@ class Contact extends Model
      *
      * @var array<int, string>
      */
-    protected $fillables = ['cle', 'organisation_id', 'e_mail', 'nom', 'prenom', 'telephon_fixe', 'service', 'fonction'];
+    protected $fillable = ['cle', 'organisation_id', 'e_mail', 'nom', 'prenom', 'telephon_fixe', 'service', 'fonction'];
 
     /**
      * Get the owning organisation of the contact
