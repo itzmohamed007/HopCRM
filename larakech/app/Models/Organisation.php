@@ -15,7 +15,7 @@ class Organisation extends Model
      *
      * @var array<int, string>
      */
-    protected $fillables = ['cle', 'nom', 'addresse', 'code_postal', 'ville', 'statut'];
+    protected $fillable = ['cle', 'nom', 'adresse', 'code_postal', 'ville', 'statut'];
 
     /**
      * Get the contacts owned by the organization.
