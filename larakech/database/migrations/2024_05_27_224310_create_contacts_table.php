@@ -15,14 +15,14 @@ return new class extends Migration
             $table->increments('id');
             $table->timestamps();
             $table->softDeletes();
-            $table->string('cle', 32);
+            $table->string('cle', 32)->nullable();
             $table->unsignedInteger('organisation_id');
             $table->string('e_mail', 200);
             $table->string('nom', 100);
             $table->string('prenom', 100);
-            $table->string('telephone_fixe', 255);
-            $table->string('service', 255);
-            $table->string('fonction', 255);
+            $table->string('telephone_fixe', 255)->nullable();
+            $table->string('service', 255)->nullable();
+            $table->string('fonction', 255)->nullable();
             $table->foreign('organisation_id')->references('id')->on('organisations')->onDelete('cascade');
         });
     }
