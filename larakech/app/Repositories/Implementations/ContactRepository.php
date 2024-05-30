@@ -2,6 +2,8 @@
 
 namespace App\Repositories\Implementations;
 
+use App\Exceptions\Customs\ModularException;
+use App\Exceptions\GlobalExceptionHandler;
 use App\Http\Requests\ContactRequest;
 use App\Models\Contact;
 use App\Repositories\Specifications\IContactRepository;
@@ -22,14 +24,39 @@ class ContactRepository implements IContactRepository
     }
 
     /**
-     * Retrieve a contact by its ID.
+     * Retrieve a single conatact by id.
      *
-     * @param int $id contact primary key
-     * @return \App\Models\Contact|null
+     * @param integer $id contact's primary key
+     * @return \Illuminate\Database\Eloquent\Collection
      */
     public function getById($id)
     {
-        return Contact::find($id);
+        try {
+            return Contact::find($id);
+        } catch (Exception $e) {
+            Log::error('an error occured while fetching contact: ' + $e->getMessage());
+            abort(500, $e->getMessage());
+        }
+    }
+
+    /**
+     * Find contact duplicates by first name and last name.
+     *
+     * @param string $nom Last name
+     * @param string $prenom First name
+     * @return boolean
+     */
+    public function isDuplicate($nom, $prenom): bool
+    {
+        try {
+            $contact = Contact::where('nom', '=', $nom)
+                ->where('prenom', '=', $prenom)
+                ->first();
+            return $contact !== null;
+        } catch (Exception $e) {
+            Log::error("a error occured while searching for contact duplicates: " . $e->getMessage());
+            abort(500, $e->getMessage());
+        }
     }
 
     /**
@@ -39,13 +66,13 @@ class ContactRepository implements IContactRepository
      * @return \App\Models\Contact
      * @throws \Exception
      */
-    public function store(ContactRequest $contactRequest)
+    public function store(array $data)
     {
         try {
-            return Contact::create($contactRequest->validated());
+            return Contact::create($data);
         } catch (Exception $e) {
             Log::error('an error occured while creating a new contact: ' . $e->getMessage());
-            throw $e;
+            abort(500, $e->getMessage());
         }
     }
 
@@ -57,22 +84,19 @@ class ContactRepository implements IContactRepository
      * @return \App\Models\Contact
      * @throws \Exception
      */
-    public function update(ContactRequest $contactRequest, $id)
+    public function update(array $data, $id)
     {
         try {
             $contact = Contact::findOrFail($id);
-            $contact->update($contactRequest->validated());
+            $contact->update($data);
             return $contact;
-        } catch(ModelNotFoundException $e) {
-            Log::error('contact not found: ' . $e->getMessage());
-            throw $e;
         } catch (Exception $e) {
             Log::error('an error occured while updating a contact: ' . $e->getMessage());
-            throw $e;
+            abort(500, $e->getMessage());
         }
     }
 
-    
+
     /**
      * Delete a contact by its ID.
      *
@@ -85,12 +109,9 @@ class ContactRepository implements IContactRepository
         try {
             $contact = Contact::findOrFail($id);
             return $contact->delete();
-        } catch (ModelNotFoundException $e) {
-            Log::error('Contact not found: ' . $e->getMessage());
-            throw $e;
         } catch (Exception $e) {
             Log::error('Error deleting contact: ' . $e->getMessage());
-            throw $e;
+            abort(500, $e->getMessage());
         }
     }
 }

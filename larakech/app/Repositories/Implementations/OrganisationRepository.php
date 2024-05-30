@@ -2,34 +2,51 @@
 
 namespace App\Repositories\Implementations;
 
+use App\Exceptions\Customs\ModularException;
+use App\Exceptions\GlobalExceptionHandler;
 use App\Models\Organisation;
 use App\Repositories\Specifications\IOrganisationRepository;
 use Exception;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Facades\Log;
 
 class OrganisationRepository implements IOrganisationRepository
 {
-    /**
-     * Create a new class instance.
-     */
-    public function __construct()
+    public function store(array $data)
     {
-        //
+        try {
+            return Organisation::create($data);
+        } catch (Exception $e) {
+            Log::error('an error occured while creating a new organisation: ' . $e->getMessage());
+            abort(500, $e->getMessage());
+        }
     }
 
     /**
-     * finds or creates an organisation by its name
-     * 
+     * Find organisation duplicates by first name and last name.
+     *
      * @param string $nom organisation name
-     * @return Organisation found/created organisation
      */
-    public function findOrCreate(array $data)
+    public function isDuplicate($nom)
     {
         try {
-            return Organisation::firstOrCreate(['nom' => $data['nom']], $data);
+            $organisation = Organisation::where('nom', '=', $nom)->first();
+            return $organisation !== null;
         } catch (Exception $e) {
-            Log::error($e->getMessage());
-            throw $e;
+            Log::error("an error occured while searching for organisation duplicates: " . $e->getMessage());
+            abort(500, $e->getMessage());
         }
+    }
+
+    public function update(array $data)
+    {
+        try {
+            $organisation = Organisation::findOrFail($data['id']);
+            if ($organisation->update($data))
+                return $organisation;
+            abort(500, "Organisation update failed !");
+        } catch (Exception $e) {
+            Log::error("An error occured while updating an organisation: " . $e->getMessage());
+            abort(500, $e->getMessage());        }
     }
 }
