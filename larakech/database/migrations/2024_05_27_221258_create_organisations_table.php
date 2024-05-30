@@ -15,12 +15,12 @@ return new class extends Migration
             $table->increments('id');
             $table->timestamps();
             $table->softDeletes();
-            $table->string('cle', 32);
+            $table->string('cle', 32)->nullable();
             $table->string('nom', 100);
-            $table->text('adresse');
-            $table->string('code_postal', 255);
-            $table->string('ville', 255);
-            $table->string('statut', 20);
+            $table->text('adresse')->nullable();
+            $table->string('code_postal', 255)->nullable();
+            $table->string('ville', 255)->nullable();
+            $table->string('statut', 20)->nullable();
         });
     }
 
