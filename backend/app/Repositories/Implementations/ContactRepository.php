@@ -2,13 +2,10 @@
 
 namespace App\Repositories\Implementations;
 
-use App\Exceptions\Customs\ModularException;
-use App\Exceptions\GlobalExceptionHandler;
 use App\Http\Requests\ContactRequest;
 use App\Models\Contact;
 use App\Repositories\Specifications\IContactRepository;
 use Exception;
-use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Facades\Log;
 
 class ContactRepository implements IContactRepository
@@ -16,11 +13,11 @@ class ContactRepository implements IContactRepository
     /**
      * Retrieve all contacts.
      *
-     * @return \Illuminate\Database\Eloquent\Collection
+     * @return
      */
     public function index()
     {
-        return Contact::all();
+        return Contact::paginate(10);
     }
 
     /**
