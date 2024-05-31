@@ -1,4 +1,6 @@
 <template>
+  <DeleteAlertModal v-if="displayDeleteModel" />
+  <DuplicateAlertModal v-if="displayDuplicateModel" />
   <div class="w-full h-screen bg-gray-100 p-5 overflow-x-hidden">
     <div class="flex items-center justify-start w-full">
       <h1 class="text-3xl font-medium text-black">Liste des contacts</h1>
@@ -7,7 +9,7 @@
       <input type="search"
         class="outline-none border border-gray-300 bg-white p-2 rounded-md w-1/3 shadow-sm focus:border-gray-400"
         placeholder="Recherche...">
-      <button
+      <button @click="displayDuplicateModel = true"
         class="border border-black font-normal text-white px-8 py-2 bg-customCyan rounded-md flex items-center gap-3"><span
           class="text-2xl">+</span>Ajouter</button>
     </div>
@@ -29,10 +31,10 @@
                 <tr v-for="contact in contacts" :key="contact">
                   <td class="text-start whitespace-nowrap px-3 py-4 text-sm font-semibold text-gray-600">{{
                     contact.prenom + ' ' + contact.nom
-                  }}</td>
+                    }}</td>
                   <td class="text-start whitespace-nowrap px-3 py-4 text-sm font-semibold text-gray-800">{{
                     contact.organisation.nom
-                    }}</td>
+                  }}</td>
                   <td class="text-start whitespace-nowrap px-3 py-4 text-xs font-semibold text-gray-500">
                     <span class="px-3 py-1 rounded-full"
                       :class="renderStatusBackgroundColor(contact.organisation.statut)">{{
@@ -41,7 +43,8 @@
                   <td class="text-start whitespace-nowrap px-10 py-4 text-sm text-gray-500 flex items-center gap-2">
                     <Icon class="cursor-pointer text-gray-500" icon="fa-regular:eye" />
                     <Icon class="cursor-pointer text-gray-500" icon="mingcute:pencil-line" :width="17" />
-                    <Icon class="cursor-pointer text-red-400" icon="material-symbols:delete-outline" :width="17" />
+                    <Icon class="cursor-pointer text-red-400" icon="material-symbols:delete-outline" :width="17"
+                      @click="displayDeleteModel = true" />
                   </td>
                 </tr>
               </tbody>
@@ -50,27 +53,29 @@
         </div>
       </div>
     </div>
-    <div class="mt-5 flex items-start justify-between w-full">
-      <p class="text-gray-600 text-xs font-normal">Showing <span class="font-semibold">1</span> of <span
-          class="font-semibold">{{ totalPages }}</span> of <span class="font-semibold">{{ totalResults }}</span> results</p>
-      <PaginationComponent @update="handlePageChangement" :totalPages="totalPages" :currentPage="currentPage" :resultsPerPage="resultsPerPage"
-        :totalResults="totalResults" />
-    </div>
+    <PaginationComponent @update="handlePageChangement" :totalPages="totalPages" :currentPage="currentPage"
+      :resultsPerPage="resultsPerPage" :totalResults="totalResults" />
   </div>
 </template>
 
 <script>
-import { Icon } from '@iconify/vue';
 import PaginationComponent from '@/components/PaginationComponent.vue';
+import DuplicateAlertModal from '@/components/DuplicateAlertModal.vue'
+import DeleteAlertModal from '@/components/DeleteAlertModal.vue'
+import { Icon } from '@iconify/vue';
 import axios from '@/axios.js'
 export default {
   name: 'HomeView',
   components: {
     Icon,
-    PaginationComponent
+    PaginationComponent,
+    DuplicateAlertModal,
+    DeleteAlertModal
   },
   data() {
     return {
+      displayDeleteModel: false,
+      displayDuplicateModel: false,
       contacts: [],
       totalPages: 0,
       currentPage: 0,
