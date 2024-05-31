@@ -1,6 +1,7 @@
 <template>
-  <DeleteAlertModal v-if="displayDeleteModel" />
-  <DuplicateAlertModal v-if="displayDuplicateModel" />
+  <DeleteAlertModal v-if="displayDeleteModal" />
+  <DuplicateAlertModal v-if="displayDuplicateModal" />
+  <ContactDisplayModal @closeDisplayModal="displayContactModal = false" :contact="contact" v-if="displayContactModal" />
   <div class="w-full h-screen bg-gray-100 p-5 overflow-x-hidden">
     <div class="flex items-center justify-start w-full">
       <h1 class="text-3xl font-medium text-black">Liste des contacts</h1>
@@ -41,7 +42,7 @@
                         contact.organisation.statut }}</span>
                   </td>
                   <td class="text-start whitespace-nowrap px-10 py-4 text-sm text-gray-500 flex items-center gap-2">
-                    <Icon class="cursor-pointer text-gray-500" icon="fa-regular:eye" />
+                    <Icon class="cursor-pointer text-gray-500" icon="fa-regular:eye" @click="displayContact(contact)" />
                     <Icon class="cursor-pointer text-gray-500" icon="mingcute:pencil-line" :width="17" />
                     <Icon class="cursor-pointer text-red-400" icon="material-symbols:delete-outline" :width="17"
                       @click="displayDeleteModel = true" />
@@ -62,6 +63,7 @@
 import PaginationComponent from '@/components/PaginationComponent.vue';
 import DuplicateAlertModal from '@/components/DuplicateAlertModal.vue'
 import DeleteAlertModal from '@/components/DeleteAlertModal.vue'
+import ContactDisplayModal from '@/components/ContactDisplayModal.vue'
 import { Icon } from '@iconify/vue';
 import axios from '@/axios.js'
 export default {
@@ -70,35 +72,30 @@ export default {
     Icon,
     PaginationComponent,
     DuplicateAlertModal,
-    DeleteAlertModal
+    DeleteAlertModal,
+    ContactDisplayModal
   },
   data() {
     return {
-      displayDeleteModel: false,
-      displayDuplicateModel: false,
+      displayDeleteModal: false,
+      displayDuplicateModal: false,
+      displayContactModal: false,
       contacts: [],
+      contact: {},
       totalPages: 0,
       currentPage: 0,
       resultsPerPage: 0,
-      totalResults: 0,
-      people: [
-        { name: 'Lindsay Walton', title: 'Front-end Developer', email: 'lindsay.walton@example.com', status: 'Lead' },
-        { name: 'Lindsay Walton', title: 'Front-end Developer', email: 'lindsay.walton@example.com', status: 'Lead' },
-        { name: 'Lindsay Walton', title: 'Front-end Developer', email: 'lindsay.walton@example.com', status: 'Client' },
-        { name: 'Lindsay Walton', title: 'Front-end Developer', email: 'lindsay.walton@example.com', status: 'Client' },
-        { name: 'Lindsay Walton', title: 'Front-end Developer', email: 'lindsay.walton@example.com', status: 'Prospect' },
-        { name: 'Lindsay Walton', title: 'Front-end Developer', email: 'lindsay.walton@example.com', status: 'Client' },
-        { name: 'Lindsay Walton', title: 'Front-end Developer', email: 'lindsay.walton@example.com', status: 'Lead' },
-        { name: 'Lindsay Walton', title: 'Front-end Developer', email: 'lindsay.walton@example.com', status: 'Lead' },
-        { name: 'Lindsay Walton', title: 'Front-end Developer', email: 'lindsay.walton@example.com', status: 'Lead' },
-        { name: 'Lindsay Walton', title: 'Front-end Developer', email: 'lindsay.walton@example.com', status: 'Lead' },
-      ]
+      totalResults: 0
     }
   },
   created() {
     this.fetch(this.currentPage);
   },
   methods: {
+    displayContact(contact) {
+      this.contact = contact;
+      this.displayContactModal = true
+    },
     handlePageChangement(page) {
       this.currentPage = page;
       this.fetch(page)
