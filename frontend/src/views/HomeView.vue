@@ -1,11 +1,12 @@
 <template>
   <ContactDisplayModal @closeDisplayModal="displayContactModal = false" :contact="contact" v-if="displayContactModal" />
-  <ContactCreateModal @fetch="handleCreate()" @closeCreateModal="displayCreateModal = false"
+  <ContactCreateModal @requestCreateContact="handleCreateRequest" @closeCreateModal="displayCreateModal = false"
     v-if="displayCreateModal" />
   <ContactUpdateModal :contact="contact" v-if="displayUpdateModal" @closeUpdateModal="displayUpdateModal = false" />
   <DeleteAlertModal @deleteContact="handleDelete()" @closeDeleteModal="displayDeleteModal = false"
     v-if="displayDeleteModal" />
-  <DuplicateAlertModal v-if="displayDuplicateModal" />
+  <DuplicateAlertModal @validateDuplicateAlertModal="handleValidDuplicateAlertMOdal()"
+    @closeDuplicateAlertModal="handleDuplicateAlertModal" v-if="displayDuplicateModal" />
   <div class="w-full h-screen bg-gray-100 p-5 overflow-x-hidden">
     <div class="flex items-center justify-start w-full">
       <h1 class="text-3xl font-medium text-black">Liste des contacts</h1>
@@ -36,10 +37,10 @@
                 <tr v-for="contact in contacts" :key="contact">
                   <td class="text-start whitespace-nowrap px-3 py-4 text-sm font-semibold text-gray-600">{{
                     contact.prenom + ' ' + contact.nom
-                    }}</td>
+                  }}</td>
                   <td class="text-start whitespace-nowrap px-3 py-4 text-sm font-semibold text-gray-800">{{
                     contact.organisation.nom
-                  }}</td>
+                    }}</td>
                   <td class="text-start whitespace-nowrap px-3 py-4 text-xs font-semibold text-gray-500">
                     <span class="px-3 py-1 rounded-full"
                       :class="renderStatusBackgroundColor(contact.organisation.statut)">{{
@@ -103,9 +104,67 @@ export default {
     this.fetch(this.currentPage);
   },
   methods: {
-    handleCreate() {
-      this.displayCreateModal = false
-      this.fetch(this.currentPage)
+    async fetch(page) {
+      try {
+        const response = await axios.get(`/contacts?page=${page}`);
+        this.contacts = response.data.data;
+        this.totalPages = response.data.meta.last_page
+        this.totalResults = response.data.meta.total;
+        this.resultsPerPage = response.data.meta.per_page
+        this.currentPage = response.data.meta.current_page;
+      } catch (error) {
+        console.log('an error occured while fetching contacts');
+        console.log(error)
+      }
+    },
+    async create() {
+      try {
+        this.errors = []
+        const response = await axios.post('/contacts', this.contact);
+        if (response.status == 201) {
+          this.displayCreateModal = false;
+          this.fetch(this.currentPage);
+        }
+      } catch (error) {
+        this.errors = []
+        Object.keys(error.response.data.errors).forEach(key => {
+          this.errors.push(error.response.data.errors[key][0])
+        })
+        this.displayErrorsBox = true
+        console.log('an error occured while create a contact')
+        console.log(error)
+      }
+    },
+    async checkForDuplicates() {
+      const contactDuplicate = await this.checkContactDuplicate();
+      const organisationDuplicate = await this.checkOrganisationDuplicate();
+      if (contactDuplicate || organisationDuplicate) {
+        this.displayCreateModal = false;
+        this.displayDuplicateModal = true;
+      } else this.create();
+    },
+    async checkContactDuplicate() {
+      try {
+        const response = await axios.post('/contacts/duplicate', {
+          'nom': this.contact.nom,
+          'prenom': this.contact.prenom
+        });
+        return response.data;
+      } catch (error) {
+        console.log('an error occured while searching for contact duplicate');
+        console.log(error);
+      }
+    },
+    async checkOrganisationDuplicate() {
+      try {
+        const response = await axios.post('/organisations/duplicate', {
+          'nom': this.contact.organisation.nom
+        });
+        return response.data;
+      } catch (error) {
+        console.log('an error occured while searching for organisation duplicate');
+        console.log(error);
+      }
     },
     async handleDelete() {
       try {
@@ -123,6 +182,17 @@ export default {
         console.log(error)
       }
     },
+    handleValidDuplicateAlertMOdal() {
+      this.displayDuplicateModal = false;
+      this.create();
+    },
+    handleDuplicateAlertModal() {
+      this.displayDuplicateModal = false
+    },
+    handleCreateRequest(contact) {
+      this.contact = contact
+      this.checkForDuplicates();
+    },
     displayDelete(contact) {
       this.contact = contact;
       this.displayDeleteModal = true;
@@ -138,19 +208,6 @@ export default {
     handlePageChangement(page) {
       this.currentPage = page;
       this.fetch(page)
-    },
-    async fetch(page) {
-      try {
-        const response = await axios.get(`/contacts?page=${page}`);
-        this.contacts = response.data.data;
-        this.totalPages = response.data.meta.last_page
-        this.totalResults = response.data.meta.total;
-        this.resultsPerPage = response.data.meta.per_page
-        this.currentPage = response.data.meta.current_page;
-      } catch (error) {
-        console.log('an error occured while fetching contacts');
-        console.log(error)
-      }
     },
     renderStatusBackgroundColor(status) {
       switch (status) {
