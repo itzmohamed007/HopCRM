@@ -59,7 +59,7 @@ class ContactRepository implements IContactRepository
     /**
      * Store a new contact.
      *
-     * @param ContactRequest $contactRequest contact body
+     * @param array $data contact 
      * @return \App\Models\Contact
      * @throws \Exception
      */
@@ -76,7 +76,7 @@ class ContactRepository implements IContactRepository
     /**
      * Update an existing contact.
      *
-     * @param ContactRequest $contactRequest
+     * @param array $data contact data
      * @param int $id
      * @return \App\Models\Contact
      * @throws \Exception

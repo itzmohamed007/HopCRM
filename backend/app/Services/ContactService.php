@@ -2,7 +2,9 @@
 
 namespace App\Services;
 
-use App\Http\Requests\ContactRequest;
+use App\Http\Requests\ContactCreateRequest;
+use App\Http\Requests\ContactDeleteRequest;
+use App\Http\Requests\ContactUpdateRequest;
 use App\Repositories\Implementations\OrganisationRepository;
 use App\Repositories\Implementations\ContactRepository;
 use Exception;
@@ -34,7 +36,7 @@ class ContactService
         return $this->contactRepository->isDuplicate($nom, $prenom);
     }
 
-    public function store(ContactRequest $request)
+    public function store(ContactCreateRequest $request)
     {
         try {
             $organisationRequest = $request->input('organisation');
@@ -55,7 +57,7 @@ class ContactService
         }
     }
 
-    public function update(ContactRequest $request)
+    public function update(ContactUpdateRequest $request)
     {
         try {
             $organisationRequest = $request->input('organisation');
@@ -77,7 +79,7 @@ class ContactService
         return $this->contactRepository->getById($id);
     }
 
-    public function delete(ContactRequest $request) {
+    public function delete(ContactDeleteRequest $request) {
         $this->contactRepository->delete($request->input('id'));
     }
 }

@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\ContactRequest;
+use App\Http\Requests\ContactCreateRequest;
+use App\Http\Requests\ContactDeleteRequest;
+use App\Http\Requests\ContactUpdateRequest;
 use App\Http\Resources\ContactResource;
 use App\Services\ContactService;
 use Illuminate\Http\Request;
@@ -37,7 +39,7 @@ class ContactController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(ContactRequest $request)
+    public function store(ContactCreateRequest $request)
     {
         return new ContactResource($this->contactService->store($request));
     }
@@ -56,7 +58,7 @@ class ContactController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(ContactRequest $request)
+    public function update(ContactUpdateRequest $request)
     {
         $contact = $this->contactService->update($request);
         return new ContactResource($contact);
@@ -65,9 +67,9 @@ class ContactController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(ContactRequest $request)
+    public function destroy(ContactDeleteRequest $request)
     {
         $this->contactService->delete($request);
-        return response()->json(null, 200);
+        return response()->json(null, 204);
     }
 }
