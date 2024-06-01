@@ -1,8 +1,10 @@
 <template>
   <ContactDisplayModal @closeDisplayModal="displayContactModal = false" :contact="contact" v-if="displayContactModal" />
-  <ContactCreateModal @closeCreateModal="displayCreateModal = false" v-if="displayCreateModal" />
+  <ContactCreateModal @fetch="handleCreate()" @closeCreateModal="displayCreateModal = false"
+    v-if="displayCreateModal" />
   <ContactUpdateModal :contact="contact" v-if="displayUpdateModal" @closeUpdateModal="displayUpdateModal = false" />
-  <DeleteAlertModal @closeDeleteModal="displayDeleteModal = false" v-if="displayDeleteModal" />
+  <DeleteAlertModal @deleteContact="handleDelete()" @closeDeleteModal="displayDeleteModal = false"
+    v-if="displayDeleteModal" />
   <DuplicateAlertModal v-if="displayDuplicateModal" />
   <div class="w-full h-screen bg-gray-100 p-5 overflow-x-hidden">
     <div class="flex items-center justify-start w-full">
@@ -45,7 +47,8 @@
                   </td>
                   <td class="text-start whitespace-nowrap px-10 py-4 text-sm text-gray-500 flex items-center gap-2">
                     <Icon class="cursor-pointer text-gray-500" icon="fa-regular:eye" @click="displayContact(contact)" />
-                    <Icon class="cursor-pointer text-gray-500" icon="mingcute:pencil-line" @click="displayUpdate(contact)" :width="17" />
+                    <Icon class="cursor-pointer text-gray-500" icon="mingcute:pencil-line"
+                      @click="displayUpdate(contact)" :width="17" />
                     <Icon class="cursor-pointer text-red-400" icon="material-symbols:delete-outline" :width="17"
                       @click="displayDelete(contact)" />
                   </td>
@@ -100,9 +103,29 @@ export default {
     this.fetch(this.currentPage);
   },
   methods: {
+    handleCreate() {
+      this.displayCreateModal = false
+      this.fetch(this.currentPage)
+    },
+    async handleDelete() {
+      try {
+        console.log(this.contact)
+        await axios.delete('/contacts', {
+          data: this.contact
+        });
+        this.displayDeleteModal = false;
+        if (this.contacts.length == 1)
+          this.fetch(this.currentPage - 1)
+        else
+          this.fetch(this.currentPage)
+      } catch (error) {
+        console.log('an error occured while deleting contact')
+        console.log(error)
+      }
+    },
     displayDelete(contact) {
+      this.contact = contact;
       this.displayDeleteModal = true;
-      console.log(contact)
     },
     displayUpdate(contact) {
       this.contact = contact
