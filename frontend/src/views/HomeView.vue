@@ -1,7 +1,9 @@
 <template>
-  <DeleteAlertModal v-if="displayDeleteModal" />
-  <DuplicateAlertModal v-if="displayDuplicateModal" />
   <ContactDisplayModal @closeDisplayModal="displayContactModal = false" :contact="contact" v-if="displayContactModal" />
+  <ContactCreateModal @closeCreateModal="displayCreateModal = false" v-if="displayCreateModal" />
+  <ContactUpdateModal :contact="contact" v-if="displayUpdateModal" @closeUpdateModal="displayUpdateModal = false" />
+  <DeleteAlertModal @closeDeleteModal="displayDeleteModal = false" v-if="displayDeleteModal" />
+  <DuplicateAlertModal v-if="displayDuplicateModal" />
   <div class="w-full h-screen bg-gray-100 p-5 overflow-x-hidden">
     <div class="flex items-center justify-start w-full">
       <h1 class="text-3xl font-medium text-black">Liste des contacts</h1>
@@ -10,8 +12,8 @@
       <input type="search"
         class="outline-none border border-gray-300 bg-white p-2 rounded-md w-1/3 shadow-sm focus:border-gray-400"
         placeholder="Recherche...">
-      <button @click="displayDuplicateModel = true"
-        class="border border-black font-normal text-white px-8 py-2 bg-customCyan rounded-md flex items-center gap-3"><span
+      <button @click="displayCreateModal = true"
+        class="border border-black font-normal text-white px-6 py-1 bg-customCyan rounded-md flex items-center gap-3"><span
           class="text-2xl">+</span>Ajouter</button>
     </div>
     <div class="mt-4 flex flex-col">
@@ -43,9 +45,9 @@
                   </td>
                   <td class="text-start whitespace-nowrap px-10 py-4 text-sm text-gray-500 flex items-center gap-2">
                     <Icon class="cursor-pointer text-gray-500" icon="fa-regular:eye" @click="displayContact(contact)" />
-                    <Icon class="cursor-pointer text-gray-500" icon="mingcute:pencil-line" :width="17" />
+                    <Icon class="cursor-pointer text-gray-500" icon="mingcute:pencil-line" @click="displayUpdate(contact)" :width="17" />
                     <Icon class="cursor-pointer text-red-400" icon="material-symbols:delete-outline" :width="17"
-                      @click="displayDeleteModel = true" />
+                      @click="displayDelete(contact)" />
                   </td>
                 </tr>
               </tbody>
@@ -64,6 +66,8 @@ import PaginationComponent from '@/components/PaginationComponent.vue';
 import DuplicateAlertModal from '@/components/DuplicateAlertModal.vue'
 import DeleteAlertModal from '@/components/DeleteAlertModal.vue'
 import ContactDisplayModal from '@/components/ContactDisplayModal.vue'
+import ContactCreateModal from '@/components/ContactCreateModal.vue'
+import ContactUpdateModal from '@/components/ContactUpdateModal.vue'
 import { Icon } from '@iconify/vue';
 import axios from '@/axios.js'
 export default {
@@ -73,13 +77,17 @@ export default {
     PaginationComponent,
     DuplicateAlertModal,
     DeleteAlertModal,
-    ContactDisplayModal
+    ContactDisplayModal,
+    ContactCreateModal,
+    ContactUpdateModal
   },
   data() {
     return {
       displayDeleteModal: false,
       displayDuplicateModal: false,
       displayContactModal: false,
+      displayCreateModal: false,
+      displayUpdateModal: false,
       contacts: [],
       contact: {},
       totalPages: 0,
@@ -92,6 +100,14 @@ export default {
     this.fetch(this.currentPage);
   },
   methods: {
+    displayDelete(contact) {
+      this.displayDeleteModal = true;
+      console.log(contact)
+    },
+    displayUpdate(contact) {
+      this.contact = contact
+      this.displayUpdateModal = true
+    },
     displayContact(contact) {
       this.contact = contact;
       this.displayContactModal = true
