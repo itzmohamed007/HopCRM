@@ -2,7 +2,8 @@
   <ContactDisplayModal @closeDisplayModal="displayContactModal = false" :contact="contact" v-if="displayContactModal" />
   <ContactCreateModal @requestCreateContact="handleCreateRequest" @closeCreateModal="displayCreateModal = false"
     v-if="displayCreateModal" />
-  <ContactUpdateModal @updateFetch="handleUpdateFetch()" :contact="contact" v-if="displayUpdateModal" @closeUpdateModal="displayUpdateModal = false" />
+  <ContactUpdateModal @updateFetch="handleUpdateFetch()" :contact="contact" v-if="displayUpdateModal"
+    @closeUpdateModal="displayUpdateModal = false" />
   <DeleteAlertModal @deleteContact="handleDelete()" @closeDeleteModal="displayDeleteModal = false"
     v-if="displayDeleteModal" />
   <DuplicateAlertModal @validateDuplicateAlertModal="handleValidDuplicateAlertMOdal()"
@@ -26,10 +27,18 @@
             <table class="min-w-full divide-y divide-gray-300">
               <thead class="bg-gray-50">
                 <tr>
-                  <th scope="col" class="w-3/6 px-3 py-3.5 text-left text-sm font-normal text-gray-500">NOM D'UN CONTACT
+                  <th @click="sortByName()" scope="col"
+                    class="w-3/6 px-3 py-3.5 text-left text-sm font-normal text-gray-500">
+                    <span class="cursor-pointer">NOM D'UN CONTACT</span>
                   </th>
-                  <th scope="col" class="w-3/6 px-3 py-3.5 text-left text-sm font-normal text-gray-500">SOCIETE</th>
-                  <th scope="col" class="px-3 py-3.5 text-left text-sm font-normal text-gray-500">STATUS</th>
+                  <th @click="sortByOrganisation()" scope="col"
+                    class="w-3/6 px-3 py-3.5 text-left text-sm font-normal text-gray-500">
+                    <span class="cursor-pointer">SOCIETE</span>
+                  </th>
+                  <th @click="sortByStatus()" scope="col"
+                    class="px-3 py-3.5 text-left text-sm font-normal text-gray-500">
+                    <span class="cursor-pointer">STATUS</span>
+                  </th>
                   <th scope="col" class="px-3 py-3.5 text-left text-sm font-normal text-gray-500"></th>
                 </tr>
               </thead>
@@ -97,7 +106,8 @@ export default {
       totalPages: 0,
       currentPage: 0,
       resultsPerPage: 0,
-      totalResults: 0
+      totalResults: 0,
+      ascending: false
     }
   },
   created() {
@@ -181,6 +191,24 @@ export default {
         console.log('an error occured while deleting contact')
         console.log(error)
       }
+    },
+    sortByName() {
+      this.ascending = !this.ascending
+      this.ascending
+        ? this.contacts.sort((x, y) => x.nom.localeCompare(y.nom))
+        : this.contacts.sort((x, y) => y.nom.localeCompare(x.nom));
+    },
+    sortByStatus() {
+      this.ascending = !this.ascending
+      this.ascending
+        ? this.contacts.sort((x, y) => x.organisation.statut.localeCompare(y.organisation.statut))
+        : this.contacts.sort((x, y) => y.organisation.statut.localeCompare(x.organisation.statut));
+    },
+    sortByOrganisation() {
+      this.ascending = !this.ascending
+      this.ascending
+        ? this.contacts.sort((x, y) => x.organisation.nom.localeCompare(y.organisation.nom))
+        : this.contacts.sort((x, y) => y.organisation.nom.localeCompare(x.organisation.nom));
     },
     handleValidDuplicateAlertMOdal() {
       this.displayDuplicateModal = false;
