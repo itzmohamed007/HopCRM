@@ -12,7 +12,7 @@
                 </div>
             </div>
             <div class="p-5 bg-gray-100 flex items-center justify-end gap-2 text-sm rounded-b-md">
-                <button class="px-5 py-2 rounded-md text-gray-900 bg-gray-100 border border-gray-300">Annuler</button>
+                <button @click="$emit('closeDeleteModal')" class="px-5 py-2 rounded-md text-gray-900 bg-gray-100 border border-gray-300">Annuler</button>
                 <button class="px-5 py-2 rounded-md text-white bg-red-500 border border-gray-300">Confirmer</button>
             </div>
         </div>
