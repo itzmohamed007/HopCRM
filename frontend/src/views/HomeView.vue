@@ -2,7 +2,7 @@
   <ContactDisplayModal @closeDisplayModal="displayContactModal = false" :contact="contact" v-if="displayContactModal" />
   <ContactCreateModal @requestCreateContact="handleCreateRequest" @closeCreateModal="displayCreateModal = false"
     v-if="displayCreateModal" />
-  <ContactUpdateModal :contact="contact" v-if="displayUpdateModal" @closeUpdateModal="displayUpdateModal = false" />
+  <ContactUpdateModal @updateFetch="handleUpdateFetch()" :contact="contact" v-if="displayUpdateModal" @closeUpdateModal="displayUpdateModal = false" />
   <DeleteAlertModal @deleteContact="handleDelete()" @closeDeleteModal="displayDeleteModal = false"
     v-if="displayDeleteModal" />
   <DuplicateAlertModal @validateDuplicateAlertModal="handleValidDuplicateAlertMOdal()"
@@ -192,6 +192,10 @@ export default {
     handleCreateRequest(contact) {
       this.contact = contact
       this.checkForDuplicates();
+    },
+    handleUpdateFetch() {
+      this.displayUpdateModal = false;
+      this.fetch(this.currentPage);
     },
     displayDelete(contact) {
       this.contact = contact;
