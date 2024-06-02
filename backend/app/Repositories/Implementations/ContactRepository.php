@@ -14,7 +14,7 @@ class ContactRepository implements IContactRepository
     /**
      * Retrieve all contacts.
      *
-     * @return
+     * @return 
      */
     public function index()
     {
@@ -41,7 +41,7 @@ class ContactRepository implements IContactRepository
      * Search for target by nom and prenom and organisation nom
      * 
      * @param string $target element to search for
-     * @return \Illuminate\Database\Eloquent\Collection
+     * @return
      */
     public function search($target)
     {
@@ -51,7 +51,7 @@ class ContactRepository implements IContactRepository
                 ->orWhereHas('organisation', function ($query) use ($target) {
                     $query->where('nom', 'LIKE', '%' . $target . '%');
                 })
-                ->get();
+                ->paginate(10);
         } catch (Exception $e) {
             Log::error('An error occurred while searching for ' . $target . ': ' . $e->getMessage());
             throw $e;
