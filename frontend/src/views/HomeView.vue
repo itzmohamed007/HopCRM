@@ -13,9 +13,13 @@
       <h1 class="text-3xl font-medium text-black">Liste des contacts</h1>
     </div>
     <div class="flex items-center justify-between w-full mt-5">
-      <input type="search"
-        class="outline-none border border-gray-300 bg-white p-2 rounded-md w-1/3 shadow-sm focus:border-gray-400"
-        placeholder="Recherche...">
+      <div class="w-1/3 flex items-center justify-between gap-1">
+        <input type="search" v-model="target"
+          class="outline-none border border-gray-300 bg-white p-2 rounded-md w-full shadow-sm focus:border-gray-400"
+          placeholder="Recherche...">
+        <button v-if="displaySearchButton" @click="search()"
+          class="border border-customCyan font-normal text-customCyan px-6 py-2 bg-white rounded-md flex items-center gap-3">Cherche</button>
+      </div>
       <button @click="displayCreateModal = true"
         class="border border-black font-normal text-white px-6 py-1 bg-customCyan rounded-md flex items-center gap-3"><span
           class="text-2xl">+</span>Ajouter</button>
@@ -46,10 +50,10 @@
                 <tr v-for="contact in contacts" :key="contact">
                   <td class="text-start whitespace-nowrap px-3 py-4 text-sm font-semibold text-gray-600">{{
                     contact.prenom + ' ' + contact.nom
-                  }}</td>
+                    }}</td>
                   <td class="text-start whitespace-nowrap px-3 py-4 text-sm font-semibold text-gray-800">{{
                     contact.organisation.nom
-                    }}</td>
+                  }}</td>
                   <td class="text-start whitespace-nowrap px-3 py-4 text-xs font-semibold text-gray-500">
                     <span class="px-3 py-1 rounded-full"
                       :class="renderStatusBackgroundColor(contact.organisation.statut)">{{
@@ -94,6 +98,11 @@ export default {
     ContactCreateModal,
     ContactUpdateModal
   },
+  watch: {
+    target() {
+      this.target == '' ? this.displaySearchButton = false : this.displaySearchButton = true;
+    }
+  },
   data() {
     return {
       displayDeleteModal: false,
@@ -101,6 +110,8 @@ export default {
       displayContactModal: false,
       displayCreateModal: false,
       displayUpdateModal: false,
+      displaySearchButton: false,
+      target: '',
       contacts: [],
       contact: {},
       totalPages: 0,
@@ -114,6 +125,16 @@ export default {
     this.fetch(this.currentPage);
   },
   methods: {
+    async search() {
+      try {
+        const response = await axios.get(`/contacts/search/${this.target}`);
+        this.contacts = response.data.data;
+        this.target = ''
+      } catch(error) {
+        console.log('an error occured while searching');
+        console.log(error);
+      }
+    },
     async fetch(page) {
       try {
         const response = await axios.get(`/contacts?page=${page}`);
