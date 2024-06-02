@@ -3,6 +3,7 @@
 namespace App\Repositories\Implementations;
 
 use App\Http\Requests\ContactRequest;
+use App\Http\Resources\ContactResource;
 use App\Models\Contact;
 use App\Repositories\Specifications\IContactRepository;
 use Exception;
@@ -33,6 +34,27 @@ class ContactRepository implements IContactRepository
         } catch (Exception $e) {
             Log::error('an error occured while fetching contact: ' + $e->getMessage());
             abort(500, $e->getMessage());
+        }
+    }
+
+    /**
+     * Search for target by nom and prenom and organisation nom
+     * 
+     * @param string $target element to search for
+     * @return \Illuminate\Database\Eloquent\Collection
+     */
+    public function search($target)
+    {
+        try {
+            return Contact::where('nom', 'LIKE', '%' . $target . '%')
+                ->orWhere('prenom', 'LIKE', '%' . $target . '%')
+                ->orWhereHas('organisation', function ($query) use ($target) {
+                    $query->where('nom', 'LIKE', '%' . $target . '%');
+                })
+                ->get();
+        } catch (Exception $e) {
+            Log::error('An error occurred while searching for ' . $target . ': ' . $e->getMessage());
+            throw $e;
         }
     }
 

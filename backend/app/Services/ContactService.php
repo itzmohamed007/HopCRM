@@ -31,6 +31,10 @@ class ContactService
         return $this->contactRepository->index();
     }
 
+    public function search($target) {
+        return $this->contactRepository->search($target);
+    }
+
     public function isDuplicate($nom, $prenom): bool
     {
         return $this->contactRepository->isDuplicate($nom, $prenom);

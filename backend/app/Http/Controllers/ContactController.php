@@ -26,6 +26,10 @@ class ContactController extends Controller
         return ContactResource::collection($this->contactService->getAll());
     }
 
+    public function search($target) {
+        return ContactResource::collection($this->contactService->search($target));
+    }
+
     public function isDuplicate(Request $request)
     {
         $validated = $request->validate([
