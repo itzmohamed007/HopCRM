@@ -2,16 +2,19 @@
 
 namespace App\Repositories\Implementations;
 
-use App\Exceptions\Customs\ModularException;
-use App\Exceptions\GlobalExceptionHandler;
 use App\Models\Organisation;
 use App\Repositories\Specifications\IOrganisationRepository;
 use Exception;
-use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Facades\Log;
 
 class OrganisationRepository implements IOrganisationRepository
 {
+    /**
+     * Store a new organisation.
+     *
+     * @param array $data The data to create the organisation with.
+     * @return \App\Models\Organisation The created organisation.
+     */
     public function store(array $data)
     {
         try {
@@ -23,9 +26,10 @@ class OrganisationRepository implements IOrganisationRepository
     }
 
     /**
-     * Find organisation duplicates by first name and last name.
+     * Check if an organisation with the given name is a duplicate.
      *
-     * @param string $nom organisation name
+     * @param string $nom The name of the organisation.
+     * @return bool True if the organisation is a duplicate, false otherwise.
      */
     public function isDuplicate($nom)
     {
@@ -38,6 +42,12 @@ class OrganisationRepository implements IOrganisationRepository
         }
     }
 
+    /**
+     * Update an existing organisation.
+     *
+     * @param array $data The data to update the organisation with.
+     * @return \App\Models\Organisation The updated organisation.
+     */
     public function update(array $data)
     {
         try {
@@ -47,6 +57,7 @@ class OrganisationRepository implements IOrganisationRepository
             abort(500, "Organisation update failed !");
         } catch (Exception $e) {
             Log::error("An error occured while updating an organisation: " . $e->getMessage());
-            abort(500, $e->getMessage());        }
+            abort(500, $e->getMessage());
+        }
     }
 }
