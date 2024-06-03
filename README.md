@@ -1,7 +1,4 @@
 # Larakech Test Project
-## Tasks Management Board:
-https://trello.com/b/WKenp4mx/mezan-assessement
-
 ## CheckList:
 <img width="548" alt="check list" src="https://github.com/itzmohamed007/HopCRM/assets/112956399/a0c88c29-a8f8-4424-8b1d-6fbfa135e645">
 
