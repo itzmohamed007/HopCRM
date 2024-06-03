@@ -1,13 +1,13 @@
 <?php
 
-namespace App\Repositories\Specifications;
+namespace App\Services\Specifications;
 
-interface IContactRepository
+interface IContactService
 {
     /**
      * Retrieve all contacts.
      */
-    public function index();
+    public function getAll();
 
     /**
      * Retrieve a contact by its ID.

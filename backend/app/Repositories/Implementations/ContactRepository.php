@@ -2,8 +2,6 @@
 
 namespace App\Repositories\Implementations;
 
-use App\Http\Requests\ContactRequest;
-use App\Http\Resources\ContactResource;
 use App\Models\Contact;
 use App\Repositories\Specifications\IContactRepository;
 use Exception;
@@ -14,7 +12,7 @@ class ContactRepository implements IContactRepository
     /**
      * Retrieve all contacts.
      *
-     * @return 
+     * @return \Illuminate\Pagination\LengthAwarePaginator Paginated list of contacts.
      */
     public function index()
     {
@@ -22,10 +20,10 @@ class ContactRepository implements IContactRepository
     }
 
     /**
-     * Retrieve a single conatact by id.
+     * Retrieve a single contact by id.
      *
-     * @param integer $id contact's primary key
-     * @return \Illuminate\Database\Eloquent\Collection
+     * @param int $id The ID of the contact to retrieve.
+     * @return \App\Models\Contact|null The contact object or null if not found.
      */
     public function getById($id)
     {
@@ -38,10 +36,11 @@ class ContactRepository implements IContactRepository
     }
 
     /**
-     * Search for target by nom and prenom and organisation nom
-     * 
-     * @param string $target element to search for
-     * @return
+     * Search for target by name, surname, and organisation name.
+     *
+     * @param string $target The search keyword.
+     * @return \Illuminate\Pagination\LengthAwarePaginator Paginated list of search results.
+     * @throws \Exception If an error occurs during the search.
      */
     public function search($target)
     {
@@ -59,13 +58,13 @@ class ContactRepository implements IContactRepository
     }
 
     /**
-     * Find contact duplicates by first name and last name.
+     * Check if a contact with the given name and surname is a duplicate.
      *
-     * @param string $nom Last name
-     * @param string $prenom First name
-     * @return boolean
+     * @param string $nom The name of the contact.
+     * @param string $prenom The surname of the contact.
+     * @return bool True if the contact is a duplicate, false otherwise.
      */
-    public function isDuplicate($nom, $prenom): bool
+    public function isDuplicate($nom, $prenom)
     {
         try {
             $contact = Contact::where('nom', '=', $nom)
@@ -79,11 +78,10 @@ class ContactRepository implements IContactRepository
     }
 
     /**
-     * Store a new contact.
+     * Store a new contact including associated organisation.
      *
-     * @param array $data contact 
-     * @return \App\Models\Contact
-     * @throws \Exception
+     * @param array $data The data to create the contact with.
+     * @return \App\Models\Contact The created contact.
      */
     public function store(array $data)
     {
@@ -96,17 +94,16 @@ class ContactRepository implements IContactRepository
     }
 
     /**
-     * Update an existing contact.
+     * Update an existing contact including associated organisation.
      *
-     * @param array $data contact data
-     * @param int $id
-     * @return \App\Models\Contact
-     * @throws \Exception
+     * @param array $data The data to update the contact with.
+     * @param int $id The ID of the contact to update.
+     * @return \App\Models\Contact The updated contact.
      */
-    public function update(array $data, $id)
+    public function update(array $data)
     {
         try {
-            $contact = Contact::findOrFail($id);
+            $contact = Contact::findOrFail($data['id']);
             $contact->update($data);
             return $contact;
         } catch (Exception $e) {
@@ -119,9 +116,8 @@ class ContactRepository implements IContactRepository
     /**
      * Delete a contact by its ID.
      *
-     * @param int $id
-     * @return bool|null
-     * @throws \Exception
+     * @param int $id The ID of the contact to delete.
+     * @return bool|null True if the contact was deleted, null otherwise.
      */
     public function delete($id)
     {

@@ -17,6 +17,8 @@ class Organisation extends Model
      */
     protected $fillable = ['cle', 'nom', 'adresse', 'code_postal', 'ville', 'statut'];
 
+    protected $table = 'organisation';
+
     /**
      * Get the contacts owned by the organization.
      *
